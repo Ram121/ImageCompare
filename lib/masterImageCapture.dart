@@ -21,7 +21,7 @@ class _MasterImageCaptureScreenState extends State<MasterImageCaptureScreen> {
   @override
   void initState() {
     super.initState();
-    controller = CameraController(widget.cameras[0], ResolutionPreset.low);
+    controller = CameraController(widget.cameras[0], ResolutionPreset.ultraHigh);
     controller.initialize().then((_) {
       if (!mounted) {
         return;
@@ -50,7 +50,10 @@ class _MasterImageCaptureScreenState extends State<MasterImageCaptureScreen> {
         children: [
           AspectRatio(aspectRatio: controller.value.aspectRatio, child: CameraPreview(controller)),
           IconButton(
-              icon: Icon(Icons.camera_alt), onPressed: onTakePictureButtonPressed, color: Colors.red, iconSize: 64),
+              icon: Icon(Icons.camera_alt),
+              onPressed: onTakePictureButtonPressed,
+              color: Colors.red,
+              iconSize: 64),
         ],
       ),
     );

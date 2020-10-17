@@ -1,9 +1,6 @@
 import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:diff_image/diff_image.dart' hide Image;
-import 'package:image/image.dart' as compImage;
+import 'package:diff_image/diff_image.dart';
+import 'package:image/image.dart';
 import 'package:path_provider/path_provider.dart';
 
 Image imageComp, imageMast;
@@ -11,6 +8,7 @@ var decodedImageComp, decodedImageMast;
 List<int> imageBytesComp, imageBytesMast;
 Directory directory;
 String dirPath;
+var firstImageFromMemory, secondImageFromMemory;
 
 class DataProvider {
   Future<bool> checkMasterImagePresent() async {
@@ -37,23 +35,26 @@ class DataProvider {
     imageBytesComp = pickedImageComp.readAsBytesSync();
     File pickedImageMast = File('$dirPath/masterImage.jpg');
     imageBytesMast = pickedImageMast.readAsBytesSync();
-    imageComp = Image.file(File('$dirPath/componentImage.jpg'));
-    imageMast = Image.file(File('$dirPath/masterImage.jpg'));
-    decodedImageComp = await decodeImageFromList(pickedImageComp.readAsBytesSync());
-    decodedImageMast = await decodeImageFromList(pickedImageMast.readAsBytesSync());
+    firstImageFromMemory = decodeImage(
+      File(
+        '$dirPath/componentImage.jpg',
+      ).readAsBytesSync(),
+    );
+    secondImageFromMemory = decodeImage(
+      File(
+        '$dirPath/masterImage.jpg',
+      ).readAsBytesSync(),
+    );
   }
 
   calculateDifference() async {
-    await getDirectories();
-    var firstImageFromMemoryComp =
-        compImage.Image.fromBytes(decodedImageComp.width.toInt(), decodedImageComp.height.toInt(), imageBytesComp);
-    var secondImageFromMemoryMast =
-        compImage.Image.fromBytes(decodedImageMast.width.toInt(), decodedImageMast.height.toInt(), imageBytesMast);
+    getDirectories();
     DiffImgResult diff = DiffImage.compareFromMemory(
-      firstImageFromMemoryComp,
-      secondImageFromMemoryMast,
+      firstImageFromMemory,
+      secondImageFromMemory,
       asPercentage: true,
     );
-    print('The difference between images is: ${diff.diffValue} percent');
+    // print('The difference between images is: ${diff.diffValue} percent');
+    return diff.diffValue;
   }
 }

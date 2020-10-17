@@ -19,12 +19,13 @@ class ImageCaptureScreen extends StatefulWidget {
 class _ImageCaptureScreenState extends State<ImageCaptureScreen> {
   CameraController controller;
   String imagePath, dirPath;
+  num result;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   VideoPlayerController videoController;
   @override
   void initState() {
     super.initState();
-    controller = CameraController(widget.cameras[0], ResolutionPreset.low);
+    controller = CameraController(widget.cameras[0], ResolutionPreset.ultraHigh);
     controller.initialize().then((_) {
       if (!mounted) {
         return;
@@ -47,19 +48,30 @@ class _ImageCaptureScreenState extends State<ImageCaptureScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: _appBar(),
-      body: Column(
-        children: [
-          AspectRatio(aspectRatio: controller.value.aspectRatio, child: CameraPreview(controller)),
-          IconButton(
-              icon: Icon(Icons.camera_alt), onPressed: onTakePictureButtonPressed, color: Colors.white, iconSize: 64),
-          IconButton(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            AspectRatio(
+                aspectRatio: controller.value.aspectRatio, child: CameraPreview(controller)),
+            IconButton(
+                icon: Icon(Icons.camera_alt),
+                onPressed: onTakePictureButtonPressed,
+                color: Colors.white,
+                iconSize: 64),
+            IconButton(
               icon: Icon(Icons.arrow_right_alt),
               iconSize: 64,
               color: Colors.white,
               onPressed: () async {
-                await DataProvider().calculateDifference();
-              })
-        ],
+                result = await DataProvider().calculateDifference();
+                setState(() {});
+                print(result);
+              },
+            ),
+            Text('Image diff is ${result.round()}',
+                style: TextStyle(fontSize: 20, color: Colors.white)),
+          ],
+        ),
       ),
     );
   }
